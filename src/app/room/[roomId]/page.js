@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useParams } from "next/navigation";
 
 import { getSocket } from "@/lib/socket";
+import ChatRoom from "@/components/ChatRoom";
 
 export default function Room() {
   const { roomId } = useParams();
@@ -13,9 +14,9 @@ export default function Room() {
 
     return () => {
       // Remove the listener when component unmounts
-      socket.off("newMessage", handleNewMessage);
+      socket.off("newMessage");
     };
   }, []);
 
-  return <div>This is a room page</div>;
+  return <ChatRoom />;
 }
