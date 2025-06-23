@@ -1,11 +1,40 @@
 "use client";
 import { useRouter } from "next/navigation";
+import { useEffect, useRef } from "react";
 
 import { MdAddCircle } from "react-icons/md";
 import { IoEnter } from "react-icons/io5";
 
+import { getSocket } from "@/lib/socket";
+
 export default function Home() {
   const router = useRouter();
+  const socketRef = useRef();
+
+  useEffect(() => {
+      const socket = getSocket();
+      socketRef.current = socket;
+      socketRef.current.on("needUsername", handleNeedUsername)
+
+      socketRef.current.on("tokenIssued", handleTokenIssued)
+  
+      return () => {
+        // Remove the listener when component unmounts
+        socketRef.current.off("needUsername");
+        socketRef.current.off("tokenIssued");
+      };
+    }, []);
+
+    const handleNeedUsername = () => {
+      console.log("I need username")
+      setTimeout(() => {
+        socketRef.current.emit("setUsername", {username: "anuj"})
+      }, 5000)
+    }
+    
+    const handleTokenIssued = (msg) => {
+      console.log(msg)
+    }
 
   const createRoom = () => {
     const roomId = "abc";
