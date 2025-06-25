@@ -1,40 +1,43 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { MdAddCircle } from "react-icons/md";
 import { IoEnter } from "react-icons/io5";
 
-import { getSocket } from "@/lib/socket";
+import ChangeUsername from "@/components/ChangeUsername";
+import { useSocket } from "@/context/SocketContext";
 
 export default function Home() {
   const router = useRouter();
-  const socketRef = useRef();
+  const [showUsernamePrompt, setShowUsernamePrompt] = useState(false);
+  const { socket, isSocketReady, userInfo } = useSocket();
 
   useEffect(() => {
-      const socket = getSocket();
-      socketRef.current = socket;
-      socketRef.current.on("needUsername", handleNeedUsername)
+    if (!isSocketReady) return;
+    socket.on("needUsername", handleNeedUsername);
 
-      socketRef.current.on("tokenIssued", handleTokenIssued)
-  
-      return () => {
-        // Remove the listener when component unmounts
-        socketRef.current.off("needUsername");
-        socketRef.current.off("tokenIssued");
-      };
-    }, []);
+    socket.on("tokenIssued", handleTokenIssued);
 
-    const handleNeedUsername = () => {
-      console.log("I need username")
-      setTimeout(() => {
-        socketRef.current.emit("setUsername", {username: "anuj"})
-      }, 5000)
-    }
-    
-    const handleTokenIssued = (msg) => {
-      console.log(msg)
-    }
+    return () => {
+      // Remove the listener when component unmounts
+      socket.off("needUsername");
+      socket.off("tokenIssued");
+    };
+  }, [isSocketReady, socket]);
+
+  const handleNeedUsername = () => {
+    setShowUsernamePrompt(true);
+  };
+
+  const updateUsername = (value) => {
+    socket.emit("setUsername", { username: value });
+  };
+
+  const handleTokenIssued = (msg) => {
+    console.log(msg);
+    setShowUsernamePrompt(false);
+  };
 
   const createRoom = () => {
     const roomId = "abc";
@@ -46,9 +49,11 @@ export default function Home() {
     router.push(`/room/${roomId}`);
   };
 
-  return (
+  return showUsernamePrompt ? (
+    <ChangeUsername updateUsername={updateUsername} userInfo={userInfo} />
+  ) : (
     <div className="h-screen flex justify-center items-center">
-      <div className="w-full md:w-1/4 h-screen md:h-1/4">
+      <div className="w-full md:w-1/3 h-screen md:h-1/4">
         <div className="p-4 backdrop-blur-xl rounded-2xl">
           <p className="text-center font-extrabold text-4xl mb-3">Welcome!</p>
           <div className="px-3 mb-3 text-xl">
