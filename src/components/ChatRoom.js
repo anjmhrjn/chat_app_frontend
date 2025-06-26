@@ -3,8 +3,8 @@ import OtherMessage from "./OtherMessage";
 
 export default function ChatRoom() {
   return (
-    <div className="h-screen antialiased text-gray-800">
-      <div className="h-full mx-auto w-full md:w-1/2 overflow-x-hidden">
+    <div className="h-screen antialiased text-gray-800 pt-8">
+      <div className="h-9/10 mx-auto w-full md:w-1/2 overflow-x-hidden">
         <div className="flex flex-col flex-auto h-full p-6">
           <div className="flex flex-col flex-auto flex-shrink-0 rounded-2xl backdrop-blur-xl h-full p-4 shadow-xl">
             <div className="flex flex-col h-full overflow-x-auto mb-4">
