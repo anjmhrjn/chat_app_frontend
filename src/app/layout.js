@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { SocketProvider } from "@/context/SocketContext";
+import { PreloaderProvider } from "@/context/PreLoaderContext";
 import Nav from "@/components/Nav";
 
 const geistSans = Geist({
@@ -25,8 +26,10 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <SocketProvider>
-          <Nav />
-          <div className="">{children}</div>
+          <PreloaderProvider>
+            <Nav />
+            <div className="">{children}</div>
+          </PreloaderProvider>
         </SocketProvider>
       </body>
     </html>

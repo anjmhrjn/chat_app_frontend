@@ -8,11 +8,14 @@ import { FaEdit } from "react-icons/fa";
 
 import ChangeUsername from "@/components/ChangeUsername";
 import { useSocket } from "@/context/SocketContext";
+import { usePreLoader } from "@/context/PreLoaderContext";
+import axios from "../axios";
 
 export default function Home() {
   const router = useRouter();
   const [showUsernamePrompt, setShowUsernamePrompt] = useState(false);
   const { socket, isSocketReady, userInfo } = useSocket();
+  const { setIsLoading } = usePreLoader();
 
   useEffect(() => {
     if (!isSocketReady) return;
@@ -38,9 +41,20 @@ export default function Home() {
     setShowUsernamePrompt(false);
   };
 
-  const createRoom = () => {
-    const roomId = "abc";
-    router.push(`/room/${roomId}`);
+  const createRoom = async () => {
+    try {
+      setIsLoading(true);
+      const result = await axios.post(`/room/`);
+      if (result?.data?.success) {
+        const roomCode = result?.data?.roomCode;
+        router.push(`/room/${roomCode}`);
+      }
+    } catch (err) {
+      console.log(err);
+      // add toast
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const joinRoom = () => {
