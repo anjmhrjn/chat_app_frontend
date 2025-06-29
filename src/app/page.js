@@ -10,18 +10,20 @@ import ChangeUsername from "@/components/ChangeUsername";
 import { useSocket } from "@/context/SocketContext";
 import { usePreLoader } from "@/context/PreLoaderContext";
 import axios from "../axios";
+import JoinRoomPrompt from "@/components/JoinRoomPrompt";
 
 export default function Home() {
   const router = useRouter();
   const [showUsernamePrompt, setShowUsernamePrompt] = useState(false);
+  const [showJoinRoomPrompt, setShowJoinRoomPrompt] = useState(false);
   const { socket, isSocketReady, userInfo } = useSocket();
   const { setIsLoading } = usePreLoader();
 
   useEffect(() => {
     if (!isSocketReady) return;
     socket.on("needUsername", handleNeedUsername);
-
     socket.on("tokenIssued", handleTokenIssued);
+    socket.emit("clientReady")
 
     return () => {
       socket.off("needUsername", handleNeedUsername);
@@ -41,13 +43,17 @@ export default function Home() {
     setShowUsernamePrompt(false);
   };
 
+  const handleUserJoined = (roomCode) => {
+    router.push(`/room/${roomCode}`);
+  };
+
   const createRoom = async () => {
     try {
       setIsLoading(true);
       const result = await axios.post(`/room/`);
       if (result?.data?.success) {
         const roomCode = result?.data?.roomCode;
-        router.push(`/room/${roomCode}`);
+        handleUserJoined(roomCode);
       }
     } catch (err) {
       console.log(err);
@@ -57,13 +63,18 @@ export default function Home() {
     }
   };
 
-  const joinRoom = () => {
-    const roomId = "def";
-    router.push(`/room/${roomId}`);
+  const handleJoinRoom = () => {
+    setShowJoinRoomPrompt(true);
+  };
+
+  const joinRoom = async (roomCode) => {
+    handleUserJoined(roomCode);
   };
 
   return showUsernamePrompt ? (
     <ChangeUsername updateUsername={updateUsername} userInfo={userInfo} />
+  ) : showJoinRoomPrompt ? (
+    <JoinRoomPrompt joinRoom={joinRoom} />
   ) : (
     <div className="h-screen flex justify-center items-center">
       <div className="w-full md:w-1/3 h-screen md:h-1/4">
@@ -93,7 +104,7 @@ export default function Home() {
           <div className="px-3 pb-3 text-xl">
             <button
               className="bg-yellow-400 hover:bg-yellow-500 text-white font-semibold rounded-full p-2 w-full"
-              onClick={joinRoom}
+              onClick={handleJoinRoom}
             >
               <span className="flex items-center justify-center">
                 Join Room
