@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { MdAddCircle } from "react-icons/md";
 import { IoEnter } from "react-icons/io5";
 import { FaEdit } from "react-icons/fa";
+import { toast } from "react-toastify";
 
 import ChangeUsername from "@/components/ChangeUsername";
 import { useSocket } from "@/context/SocketContext";
@@ -52,12 +53,13 @@ export default function Home() {
       setIsLoading(true);
       const result = await axios.post(`/room/`);
       if (result?.data?.success) {
+        toast.success("Room created successfully!")
         const roomCode = result?.data?.roomCode;
         handleUserJoined(roomCode);
       }
     } catch (err) {
       console.log(err);
-      // add toast
+      toast.error("Could not create a room")
     } finally {
       setIsLoading(false);
     }

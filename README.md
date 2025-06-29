@@ -1,36 +1,43 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+This is a real-time chat application built with Next.js (App Router), Socket.IO, and Tailwind CSS. It allows users to create or join chat rooms using a guest username. The app ensures secure communication and seamless user experience across multiple rooms.
 
-## Getting Started
+## ✨ Features
+🔌 Real-time messaging with WebSockets (Socket.IO)
 
-First, run the development server:
+🧑 Unique guest identification using JWT tokens
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+🛡️ Secure room access and message sending via token validation
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+💬 Multiple room support with unique usernames per room
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+💾 Persistent chat history fetched from backend API
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+⚡ Smooth UI:
 
-## Learn More
+Autosizing message input (like ChatGPT)
 
-To learn more about Next.js, take a look at the following resources:
+Scroll-to-bottom on new messages
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Loading overlays and custom toast notifications
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🗂️ Tech Stack
+Frontend: Next.js (App Router), Tailwind CSS, React Context API
 
-## Deploy on Vercel
+Backend: Node.js, Express, Socket.IO
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Database: MongoDB with Mongoose
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Auth: JWT (stateless, short-lived tokens with localStorage)
+
+State Management: React Context for socket and loading states
+
+## 📌 Notes
+A guest ID is generated and stored in localStorage for unique identification.
+
+Tokens are short-lived and auto-refreshed using a timer on the client.
+
+Room members and message logs are stored in MongoDB.
+
+Username collision is handled by associating both username and guest ID.
+
+## 📄 License
+MIT License

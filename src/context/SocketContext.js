@@ -2,6 +2,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { jwtDecode } from "jwt-decode";
+import { toast } from "react-toastify";
 
 const SocketContext = createContext();
 
@@ -41,6 +42,10 @@ export function SocketProvider({ children }) {
       localStorage.setItem("token", token);
       scheduleTokenRefresh(decoded?.exp);
     });
+
+    socket.on("error", (err) => {
+      toast.error(err)
+    })
 
     setIsSocketReady(true);
 

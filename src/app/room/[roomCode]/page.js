@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 
 import ChatRoom from "@/components/ChatRoom";
@@ -7,6 +7,7 @@ import { useSocket } from "@/context/SocketContext";
 import ChangeUsername from "@/components/ChangeUsername";
 import { usePreLoader } from "@/context/PreLoaderContext";
 import axios from "../../../axios";
+import { toast } from "react-toastify";
 
 export default function Room() {
   const { roomCode } = useParams();
@@ -14,6 +15,7 @@ export default function Room() {
   const [showUsernamePrompt, setShowUsernamePrompt] = useState(false);
   const [hasJoinedRoom, setHasJoinedRoom] = useState(false);
   const { setIsLoading } = usePreLoader();
+  const hasAttemptedJoin = useRef(false);
 
   useEffect(() => {
     if (!isSocketReady) return;
@@ -31,8 +33,9 @@ export default function Room() {
   }, [isSocketReady, socket]);
 
   useEffect(() => {
-    if (userInfo) {
+    if (userInfo && !hasAttemptedJoin.current) {
       joinRoom();
+      hasAttemptedJoin.current = true
     }
   }, [userInfo]);
 
@@ -62,22 +65,26 @@ export default function Room() {
       }
     } catch (err) {
       console.log(err);
-      // add toast
+      toast.error("Could not join a room");
     } finally {
       setIsLoading(false);
     }
   };
 
-  return showUsernamePrompt ? (
-    <ChangeUsername updateUsername={updateUsername} userInfo={userInfo} />
-  ) : (
-    hasJoinedRoom && (
-      <ChatRoom
-        roomCode={roomCode}
-        userInfo={userInfo}
-        socket={socket}
-        setIsLoading={setIsLoading}
-      />
-    )
+  return (
+    <div>
+      {showUsernamePrompt ? (
+        <ChangeUsername updateUsername={updateUsername} userInfo={userInfo} />
+      ) : (
+        hasJoinedRoom && (
+          <ChatRoom
+            roomCode={roomCode}
+            userInfo={userInfo}
+            socket={socket}
+            setIsLoading={setIsLoading}
+          />
+        )
+      )}
+    </div>
   );
 }

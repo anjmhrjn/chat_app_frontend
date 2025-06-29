@@ -1,25 +1,28 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { ImExit } from "react-icons/im";
 import { BsFillSendFill } from "react-icons/bs";
-import TextareaAutosize from 'react-textarea-autosize'
+import TextareaAutosize from "react-textarea-autosize";
 
 import axios from "../axios";
+import { toast } from "react-toastify";
 
 export default function ChatRoom({ roomCode, userInfo, socket, setIsLoading }) {
   const [allMessages, setAllMessages] = useState([]);
   const [currentMessage, setCurrentMessage] = useState("");
   const messagesEndRef = useRef(null);
+  const router = useRouter();
   useEffect(() => {
-    const handleUserLeft = ({ username }) => {
+    const userLeftHandler = ({ username }) => {
       setAllMessages((prev) => [
         ...prev,
         { type: "info", message: `${username} has left the room` },
       ]);
     };
 
-    const handleUserJoined = ({ username }) => {
+    const userJoinedHandler = ({ username }) => {
       setAllMessages((prev) => [
         ...prev,
         { type: "info", message: `${username} has joined the room` },
@@ -37,13 +40,13 @@ export default function ChatRoom({ roomCode, userInfo, socket, setIsLoading }) {
       ]);
     };
 
-    socket.on("userLeft", handleUserLeft);
-    socket.on("userJoined", handleUserJoined);
+    socket.on("userLeft", userLeftHandler);
+    socket.on("userJoined", userJoinedHandler);
     socket.on("newMessage", handleNewMessage);
 
     return () => {
-      socket.off("userLeft", handleUserLeft);
-      socket.off("userJoined", handleUserJoined);
+      socket.off("userLeft", userLeftHandler);
+      socket.off("userJoined", userJoinedHandler);
       socket.off("newMessage", handleNewMessage);
     };
   }, [socket]);
@@ -65,11 +68,13 @@ export default function ChatRoom({ roomCode, userInfo, socket, setIsLoading }) {
       setIsLoading(true);
       const result = await axios.post(`/room/leave-room`, { roomCode });
       if (result?.data?.success) {
+        toast.success("Room left successfully!");
         socket.emit("leaveRoom", { roomCode: roomCode });
+        router.push("/");
       }
     } catch (err) {
       console.log(err);
-      // add toast
+      toast.error("Could not leave a room");
     } finally {
       setIsLoading(false);
     }
@@ -83,7 +88,7 @@ export default function ChatRoom({ roomCode, userInfo, socket, setIsLoading }) {
       }
     } catch (err) {
       console.log(err);
-      // add toast
+      toast.error("Error getting all the messages");
     }
   };
 
