@@ -74,7 +74,7 @@ export default function Home() {
   return showUsernamePrompt ? (
     <ChangeUsername updateUsername={updateUsername} userInfo={userInfo} />
   ) : showJoinRoomPrompt ? (
-    <JoinRoomPrompt joinRoom={joinRoom} />
+    <JoinRoomPrompt joinRoom={joinRoom} setShowJoinRoomPrompt={setShowJoinRoomPrompt} />
   ) : (
     <div className="h-screen flex justify-center items-center">
       <div className="w-full md:w-1/3 h-screen md:h-1/4">

@@ -6,7 +6,7 @@ import ChatRoom from "@/components/ChatRoom";
 import { useSocket } from "@/context/SocketContext";
 import ChangeUsername from "@/components/ChangeUsername";
 import { usePreLoader } from "@/context/PreLoaderContext";
-import axios from "../../../axios"
+import axios from "../../../axios";
 
 export default function Room() {
   const { roomCode } = useParams();
@@ -21,7 +21,7 @@ export default function Room() {
     socket.on("tokenIssued", handleTokenIssued);
     socket.on("userJoined", handleUserJoined);
 
-    socket.emit("clientReady")
+    socket.emit("clientReady");
 
     return () => {
       socket.off("needUsername", handleNeedUsername);
@@ -32,9 +32,9 @@ export default function Room() {
 
   useEffect(() => {
     if (userInfo) {
-      joinRoom()
+      joinRoom();
     }
-  }, [userInfo])
+  }, [userInfo]);
 
   const handleNeedUsername = () => {
     setShowUsernamePrompt(true);
@@ -71,6 +71,13 @@ export default function Room() {
   return showUsernamePrompt ? (
     <ChangeUsername updateUsername={updateUsername} userInfo={userInfo} />
   ) : (
-    hasJoinedRoom && <ChatRoom />
+    hasJoinedRoom && (
+      <ChatRoom
+        roomCode={roomCode}
+        userInfo={userInfo}
+        socket={socket}
+        setIsLoading={setIsLoading}
+      />
+    )
   );
 }
